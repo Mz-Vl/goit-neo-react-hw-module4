@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import fetchImages from './api';
 import SearchBar from './components/SearchBar/SearchBar';
 import ImageGallery from './components/ImageGallery/ImageGallery';
@@ -28,8 +28,12 @@ function App() {
       try {
         const data = await fetchImages(query, page);
         setImages((prevImages) => [...prevImages, ...data.results]);
+        if (data.results.length === 0) {
+          toast.error('No images found for your query. Try a different search term.');
+        }
       } catch (error) {
         setError('Failed to load images. Please try again.');
+        toast.error('Failed to load images. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -42,6 +46,7 @@ function App() {
     setQuery(newQuery);
     setPage(1);
     setImages([]);
+    toast.success(`Searching for ${newQuery}`);
   };
 
   const handleLoadMore = () => {
@@ -74,7 +79,7 @@ function App() {
           image={selectedImage}
           onClose={closeModal} />
       )}
-      <Toaster position="top-right" />
+      <Toaster position="top-right" className="toaster" />
     </div>
   );
 }
